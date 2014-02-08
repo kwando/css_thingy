@@ -28,4 +28,17 @@ class SelectorTest < SelectorTestCase
 
     assert_match selector, elem
   end
+
+
+  def test_ancestor_selector
+    div = Element.new('div')
+    div.add_class('success')
+
+    button = Element.new('button')
+    button.parent = div
+
+    selector = AllSelector.new(AncestorSelector.new(TagSelector.new('div')), TagSelector.new('button'))
+
+    assert_match selector, button
+  end
 end

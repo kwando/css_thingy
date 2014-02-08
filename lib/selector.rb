@@ -56,6 +56,30 @@ class CombinedSelector < TagSelector
   end
 end
 
+class ParentSelector
+  def initialize(selector)
+    @selector = selector
+  end
+
+  def matches?(element)
+    element.has_parent? && selector.matches?(element.parent)
+  end
+end
+
+class AncestorSelector
+  def initialize(selector)
+    @selector = selector
+  end
+
+  def matches?(element)
+    while element.has_parent?
+      return true if @selector.matches?(element.parent)
+      element = element.parent
+    end
+    return false
+  end
+end
+
 class AllSelector < CombinedSelector
   def matches?(element)
     selectors.all?{|selector| selector.matches?(element) }
