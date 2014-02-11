@@ -8,6 +8,11 @@ end
 # # # # # # # # # # # # # # # # # # # #
 # Example selectors
 # # # # # # # # # # # # # # # # # # # #
+class AlwaysSelector
+  def matches?(element)
+    true
+  end
+end
 class TagSelector
   def initialize(tag_name)
     @tag_name = tag_name
@@ -18,7 +23,11 @@ class TagSelector
   end
 
   def to_s
-    @tag_names
+    @tag_name
+  end
+
+  def ==(selector)
+    @tag_name == selector.to_s
   end
 end
 
@@ -34,11 +43,18 @@ class ClassSelector
   def to_s
     ".#{@css_class}"
   end
+
+  def ==(selector)
+    to_s == selector.to_s
+  end
 end
 
 class CombinedSelector < TagSelector
   def initialize(*args)
-    @selectors = *args
+    @selectors = []
+    args.each do |s|
+      add_selector(s)
+    end
   end
 
   def add_selector(selector)
@@ -83,6 +99,13 @@ end
 class AllSelector < CombinedSelector
   def matches?(element)
     selectors.all?{|selector| selector.matches?(element) }
+  end
+
+  def merge(all_selector)
+    raise TypeError unless all_selector.kind_of?(AllSelector)
+    all_selector.selectors.each do |s|
+      add_selector(s)
+    end
   end
 end
 
